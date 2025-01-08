@@ -1,0 +1,21 @@
+import pandas as pd
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+
+# Sample dataset
+data = {'title': ['Movie1', 'Movie2', 'Movie3'], 
+        'genre': ['Action Comedy', 'Drama', 'Action Drama']}
+df = pd.DataFrame(data)
+
+def recommend_movies(title):
+    count = CountVectorizer()
+    matrix = count.fit_transform(df['genre'])
+    similarity = cosine_similarity(matrix)
+    indices = pd.Series(df.index, index=df['title'])
+    idx = indices[title]
+    sim_scores = list(enumerate(similarity[idx]))
+    sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
+    sim_scores = sim_scores[1:]
+    return [df['title'][i[0]] for i in sim_scores]
+
+print(recommend_movies('Movie1'))
